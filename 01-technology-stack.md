@@ -15,7 +15,7 @@
 
 ---
 
-## 🏗️ 1. 技术栈全景图
+## 1. 技术栈全景图
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -48,9 +48,91 @@
 
 ---
 
-## 🔍 2. 核心技术栈详解
+## 2. 核心技术栈详解
 
-### 2.1 LLM (大语言模型) 层
+### 2.1 UCAgent 应用层
+
+**作用**: 定义验证流程和检查逻辑,是整个系统的最上层
+
+**核心组件**:
+1. **Stage 配置系统** (源码: `stage/vstage.py`)
+2. **Checker 验证系统** (源码: `checkers/base.py`)
+3. **工具系统** (源码: `tools/`)
+
+**Stage 配置示例** (`lang/zh/config/default.yaml:93-725`):
+```yaml
+stages:
+  - name: "理解规格"
+    prompt: "请仔细阅读规格文档..."
+    checker: "SpecChecker"
+
+  - name: "编写测试"
+    prompt: "根据规格编写pytest测试..."
+    checker: "TestChecker"
+```
+
+**Checker 基类** (`checkers/base.py:14-260`):
+```python
+class Checker:
+    def check(self) -> bool:
+        """检查当前Stage是否完成"""
+        raise NotImplementedError
+```
+
+**关键特性**:
+- **配置驱动**: 通过YAML定义验证流程
+- **可扩展**: 支持自定义Stage和Checker
+- **多语言**: 支持中文/英文配置
+
+---
+
+### 2.2 LangGraph (Agent 框架) 层
+
+**作用**: 提供 ReAct Agent 的实现框架,管理推理-行动循环
+
+**技术选型**: `langgraph` (LangChain 生态的图执行引擎)
+
+**核心函数**: `create_react_agent`
+
+**源码位置**: `verify_agent.py:255-261`
+
+```python
+from langgraph.prebuilt import create_react_agent
+
+self.agent = create_react_agent(
+    model=self.model,              # LLM 模型
+    tools=self.test_tools,         # 工具列表
+    checkpointer=MemorySaver(),    # 对话历史保存
+    pre_model_hook=message_manage_node,  # 消息管理钩子
+    state_schema=State,            # 状态模式
+)
+```
+
+**ReAct 循环机制**:
+```
+1. Reasoning (推理)
+   ↓
+   LLM 分析当前状态,决定下一步行动
+   ↓
+2. Acting (行动)
+   ↓
+   调用工具 (ReadTextFile, Check, Complete 等)
+   ↓
+3. Observation (观察)
+   ↓
+   接收工具返回结果
+   ↓
+   回到步骤 1,继续循环...
+```
+
+**关键特性**:
+- **工具绑定**: 自动将工具列表转换为 LLM 可调用的函数
+- **错误处理**: 自动处理工具调用失败并重试
+- **消息压缩**: 通过 `pre_model_hook` 管理上下文长度
+
+---
+
+### 2.3 LLM (大语言模型) 层
 
 **作用**: 提供智能推理能力,理解任务、生成代码、分析结果
 
@@ -99,111 +181,6 @@ def get_chat_model(cfg: Config, callbacks: Any = None) -> Any:
 - **统一接口**: 所有LLM通过LangChain统一调用
 - **速率限制**: 内置 `InMemoryRateLimiter` 防止API超限
 - **流式输出**: 支持 streaming 模式实时显示推理过程
-
----
-
-### 2.2 MCP (Model Context Protocol) 层
-
-**作用**: 将UCAgent作为MCP Server暴露给外部Code Agent调用
-
-**技术选型**: `fastmcp` (FastMCP框架)
-
-**支持的Code Agent**:
-- **Claude Code** (Anthropic官方CLI)
-- **Qwen Code** (阿里通义千问CLI)
-- **Gemini CLI** (Google官方CLI)
-- **VS Code Copilot** (通过MCP扩展)
-- **Cherry Studio** (第三方客户端)
-
-**核心功能** (源码: `util/functions.py:1078-1122`):
-```python
-from mcp.server.fastmcp import FastMCP
-
-# 创建MCP Server
-mcp = FastMCP("UnityTest", tools=fastmcp_tools, host=host, port=port)
-
-# 工具转换: LangChain Tool → FastMCP Tool
-# tools/uctool.py:316-343
-def to_fastmcp(tool: BaseTool) -> FastMCPTool:
-    """将LangChain工具转换为FastMCP工具"""
-    fastmcp_tool = FastMCPTool(
-        name=tool.name,
-        description=tool.description,
-        fn=async_wrapper,  # 异步包装
-        context_kwarg="ctx" if isinstance(tool, UCTool) else None
-    )
-```
-
-**启动方式**:
-```bash
-# 启动MCP Server (包含文件操作工具)
-ucagent --mcp-server --mcp-server-port 5000
-
-# 启动MCP Server (不含文件操作工具,避免冲突)
-ucagent --mcp-server-no-file-tools --mcp-server-port 5000
-```
-
-**客户端配置示例** (以Qwen Code为例):
-```json
-{
-  "mcpServers": {
-    "unitytest": {
-      "url": "http://127.0.0.1:5000/mcp"
-    }
-  }
-}
-```
-
-**关键特性**:
-- **流式交互**: 通过 `ctx.info()` 实时推送日志到客户端
-- **工具隔离**: 可选择是否暴露文件操作工具
-- **端口复用**: 支持多实例并发(不同端口)
-
----
-
-### 2.3 LangGraph (Agent 框架) 层
-
-**作用**: 提供 ReAct Agent 的实现框架,管理推理-行动循环
-
-**技术选型**: `langgraph` (LangChain 生态的图执行引擎)
-
-**核心函数**: `create_react_agent`
-
-**源码位置**: `verify_agent.py:255-261`
-
-```python
-from langgraph.prebuilt import create_react_agent
-
-self.agent = create_react_agent(
-    model=self.model,              # LLM 模型
-    tools=self.test_tools,         # 工具列表
-    checkpointer=MemorySaver(),    # 对话历史保存
-    pre_model_hook=message_manage_node,  # 消息管理钩子
-    state_schema=State,            # 状态模式
-)
-```
-
-**ReAct 循环机制**:
-```
-1. Reasoning (推理)
-   ↓
-   LLM 分析当前状态,决定下一步行动
-   ↓
-2. Acting (行动)
-   ↓
-   调用工具 (ReadTextFile, Check, Complete 等)
-   ↓
-3. Observation (观察)
-   ↓
-   接收工具返回结果
-   ↓
-   回到步骤 1,继续循环...
-```
-
-**关键特性**:
-- **工具绑定**: 自动将工具列表转换为 LLM 可调用的函数
-- **错误处理**: 自动处理工具调用失败并重试
-- **消息压缩**: 通过 `pre_model_hook` 管理上下文长度
 
 ---
 
@@ -323,7 +300,7 @@ io.a.value = 5  # 等价于 dut.io_a.value = 5
 
 ---
 
-## 🔗 3. 层间交互机制
+## 3. 层间交互机制
 
 **LLM ↔ LangGraph**:
 - LLM 输出工具调用指令
@@ -353,7 +330,7 @@ io.a.value = 5  # 等价于 dut.io_a.value = 5
 
 ---
 
-## 📝 4. 总结
+## 4. 总结
 
 ### 4.1 技术栈优势
 
@@ -371,4 +348,6 @@ io.a.value = 5  # 等价于 dut.io_a.value = 5
 
 ---
 
-**下一章**: [02-prompt-engineering.md](./02-prompt-engineering.md) - 深入解析Prompt设计
+## 下一章
+
+[02-prompt-engineering.md](./02-prompt-engineering.md) - 深入解析Prompt设计

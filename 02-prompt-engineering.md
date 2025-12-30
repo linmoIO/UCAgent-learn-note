@@ -17,7 +17,7 @@ Bug 发现机制：优先怀疑设计，不修改 DUT；保留 Fail 用例作为
 
 ---
 
-## 📋 1. Prompt 的整体结构
+## 1. Prompt 的整体结构
 
 UCAgent 的 Prompt 分为两个层次：
 
@@ -34,7 +34,7 @@ UCAgent 的 Prompt 分为两个层次：
 
 ---
 
-## 🎭 2. System Prompt 完整解析
+## 2. System Prompt 完整解析
 
 System Prompt 是 UCAgent 的核心，它定义了 LLM 的"人格"和工作方式。
 
@@ -141,7 +141,7 @@ System Prompt 是 UCAgent 的核心，它定义了 LLM 的"人格"和工作方�
 
 ---
 
-## 📝 3. Stage Task Prompt 设计
+## 3. Stage Task Prompt 设计
 
 每个 Stage 的 Prompt 都是动态生成的，包含当前阶段的具体任务。
 
@@ -197,7 +197,7 @@ task:
 
 ---
 
-## 🐛 4. Prompt 引导 bug 发现的机制
+## 4. Prompt 引导 bug 发现的机制
 
 ### 4.1 核心 Prompt 设计
 
@@ -222,7 +222,7 @@ LLM 的默认行为倾向于"让测试通过",可能会修改测试用例来掩�
 
 ---
 
-## 📝 5. 总结
+## 5. 总结
 
 ### 5.1 Prompt 的核心作用
 
@@ -240,4 +240,6 @@ LLM 的默认行为倾向于"让测试通过",可能会修改测试用例来掩�
 
 ---
 
-**下一章**： [03-key-algorithms.md](./03-key-algorithms.md)
+## 下一章
+
+[03-key-algorithms.md](./03-key-algorithms.md) - 关键算法详解

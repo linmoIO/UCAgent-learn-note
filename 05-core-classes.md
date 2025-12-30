@@ -27,7 +27,7 @@
 
 ---
 
-## 🎯 1. VerifyAgent 类
+## 1. VerifyAgent 类
 
 **位置**：`verify_agent.py:40`
 
@@ -130,7 +130,7 @@ def get_current_tips(self):
 
 ---
 
-## 📋 2. StageManager 类
+## 2. StageManager 类
 
 ### 2.1 类定义
 
@@ -279,7 +279,7 @@ def complete(self, timeout):
 
 ---
 
-## 🔖 3. VerifyStage 类
+## 3. VerifyStage 类
 
 ### 3.1 类定义
 
@@ -402,7 +402,7 @@ def is_group(self):
 
 ---
 
-## ✅ 4. Checker 基类
+## 4. Checker 基类
 
 ### 4.1 UCChecker 基类
 
@@ -483,7 +483,7 @@ class HumanChecker(UCChecker):
 
 ---
 
-## 🔧 5. UCTool 基类
+## 5. UCTool 基类
 
 ### 5.1 类定义
 
@@ -511,7 +511,7 @@ class UCTool(BaseTool):
 
 ---
 
-## 🔗 6. 类关系图
+## 6. 类关系图
 
 ```
 VerifyAgent

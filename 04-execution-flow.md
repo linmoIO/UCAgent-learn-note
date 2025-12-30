@@ -16,7 +16,7 @@
 
 ---
 
-## 🚀 1. 启动流程
+## 1. 启动流程
 
 ### 1.1 命令行入口
 
@@ -64,7 +64,7 @@ def get_args() -> argparse.Namespace:
 
 ---
 
-## ⚙️ 2. VerifyAgent 初始化
+## 2. VerifyAgent 初始化
 
 ### 2.1 初始化流程概览
 
@@ -161,7 +161,7 @@ self.tool_list_task = [
 
 ---
 
-## 📋 3. StageManager 初始化
+## 3. StageManager 初始化
 
 ### 3.1 Stage 解析流程
 
@@ -224,7 +224,7 @@ Root Stage (组)
 
 ---
 
-## 🔁 4. 主循环执行
+## 4. 主循环执行
 
 ### 4.1 run() 方法
 
@@ -288,7 +288,7 @@ def one_loop(self, msg=None):
 
 ---
 
-## 🤖 5. ReAct 循环详解
+## 5. ReAct 循环详解
 
 ### 5.1 get_current_tips()
 
@@ -374,7 +374,7 @@ def do_work_values(self, instructions, config):
 
 ---
 
-## ✅ 6. Checker 执行流程
+## 6. Checker 执行流程
 
 ### 6.1 Check 工具调用
 
@@ -448,7 +448,7 @@ def do_check(self, timeout, is_complete=False):
 
 ---
 
-## 🎯 7. Complete 流程
+## 7. Complete 流程
 
 ### 7.1 Complete 工具调用
 
@@ -497,7 +497,7 @@ def complete(self, timeout):
 
 ---
 
-## 💬 8. 消息历史管理
+## 8. 消息历史管理
 
 ### 8.1 消息压缩机制
 
@@ -542,7 +542,7 @@ def state_record_mesg(self, msg):
 
 ---
 
-## 📊 9. 完整执行流程图
+## 9. 完整执行流程图
 
 ```
 启动
@@ -591,4 +591,6 @@ Check 通过 → Complete → 下一阶段
 
 ---
 
-**下一章**： [05-core-classes.md](./05-core-classes.md)
+## 下一章
+
+[05-core-classes.md](./05-core-classes.md) - 核心类详解

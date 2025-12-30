@@ -2,7 +2,7 @@
 
 > 深入理解 UCAgent 的所有源码、算法、设计思路
 
-## 🎯 一段话说明UCAgent
+## 一段话说明UCAgent
 
 **UCAgent = LLM + 测试框架**，底层验证和测试用的是 toffee 等工具链。
 
@@ -14,7 +14,7 @@ UCAgent 首先用 YAML 配置文件规范了测试的整个流程，分成了诸
 
 ---
 
-## 🏗️ 核心理念
+## 核心理念
 
 解读 UCAgent 要围绕**系统架构**和**Prompt工程**这两个方面展开。
 
@@ -29,44 +29,56 @@ UCAgent 首先用 YAML 配置文件规范了测试的整个流程，分成了诸
 
 ---
 
-## 📚 学习路径
+## 学习路径
 
 按顺序阅读以下笔记，从核心概念到底层实现：
 
-### 0. 核心概念 🎯
+### 0. 核心概念
 **[00-core-concepts.md](./00-core-concepts.md)**
 - UCAgent 架构与三大核心：Stage、Agent、Checker
 - LangGraph ReAct 框架与执行机制
 - Stage 配置解析与执行控制
 - 完整工作流程
 
-### 1. 技术栈详解 🔧
+### 1. 技术栈详解
 **[01-technology-stack.md](./01-technology-stack.md)**
-- 5层架构：LLM → LangGraph → pytest+toffee → Verilator
+- 5层架构：应用层 → LangGraph → LLM → pytest+toffee → Verilator
 - 各层技术选型与协同机制
 
-### 2. Prompt 工程 💬
+### 2. Prompt 工程
 **[02-prompt-engineering.md](./02-prompt-engineering.md)**
 - System Prompt 设计：角色、目标、工作流程
 - Stage Task Prompt 动态生成
 - Bug 发现引导机制
 
-### 3. 关键算法 ⚙️
+### 3. 关键算法
 **[03-key-algorithms.md](./03-key-algorithms.md)**
 - Stage 递归解析（vstage.py:367-404）
 - Stage 树扁平化（vstage.py:300-306）
 - 批处理任务管理
 
-### 4. 执行流程 🔄
+### 4. 执行流程
 **[04-execution-flow.md](./04-execution-flow.md)**
 - 启动到完成的完整调用链
 - ReAct 循环与 Checker 执行
 
-### 5. 核心类实现 📦
+### 5. 核心类实现
 **[05-core-classes.md](./05-core-classes.md)**
 - VerifyAgent、StageManager、VerifyStage
 - Checker 基类与工具系统
 
 ---
 
-**开始学习**：从 [00-core-concepts.md](./00-core-concepts.md) 开始
+## 相关链接
+
+UCAgent源码：https://github.com/XS-MLVP/UCAgent
+
+UCAgent开发者手册：https://ucagent.open-verify.cc/
+
+LangGraph：https://langgraph.readthedocs.io/en/latest/
+
+---
+
+## 开始学习
+
+从 [00-core-concepts.md](./00-core-concepts.md) 开始，核心概念部分。

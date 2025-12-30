@@ -16,7 +16,7 @@
 
 ---
 
-## 🎯 1. UCAgent 是什么？
+## 1. UCAgent 是什么？
 
 UCAgent 是一个基于大语言模型的自动化硬件验证系统,让 LLM 像人类验证工程师一样自动完成芯片验证的全流程。
 
@@ -196,7 +196,7 @@ anthropic:
 
 ---
 
-## 🔑 2. 三大核心概念
+## 2. 三大核心概念
 
 UCAgent 的架构基于三个核心概念：**Stage**、**Agent**、**Checker**。
 
@@ -424,7 +424,7 @@ LLM 根据反馈决定下一步行动：
 
 ---
 
-## 🔄 3. 三者的协同工作
+## 3. 三者的协同工作
 
 ### 3.1 完整工作流程
 
@@ -563,7 +563,7 @@ def complete(self, timeout):
 
 ---
 
-## 📝 4. 总结
+## 4. 总结
 
 ### 核心要点
 
@@ -586,4 +586,6 @@ def complete(self, timeout):
 
 ---
 
-**下一章**： [01-technology-stack.md](./01-technology-stack.md)
+## 下一章
+
+[01-technology-stack.md](./01-technology-stack.md) - 技术栈详解
