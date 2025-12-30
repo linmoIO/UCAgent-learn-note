@@ -1,8 +1,22 @@
-# UCAgent 学习笔记
+# UCAgent 源码学习笔记
 
-> 深入理解 UCAgent 的所有源码、算法、设计思路
+> 深入理解 UCAgent 的源码、算法
 
-## 一段话说明UCAgent
+---
+
+## UCAgent 是什么
+
+**UCAgent** 是一个基于大语言模型（LLM）的硬件验证自动化工具，专门用于 RTL（寄存器传输级）设计的自动化测试和验证。它通过 AI Agent 自动完成从环境搭建、测试用例编写到验证执行的完整流程，大幅降低硬件验证的人工成本。
+
+> **重要说明**：本笔记专注于 UCAgent 的**源码学习和架构分析**。如需开发或使用 UCAgent，请参考官方仓库和开发者手册。
+
+UCAgent源码：https://github.com/XS-MLVP/UCAgent
+
+UCAgent开发者手册：https://ucagent.open-verify.cc/
+
+LangGraph：https://langgraph.readthedocs.io/en/latest/
+
+## 🔆 一段话说明UCAgent
 
 **UCAgent = LLM + 测试框架**，底层验证和测试用的是 toffee 等工具链。
 
@@ -66,16 +80,6 @@ UCAgent 首先用 YAML 配置文件规范了测试的整个流程，分成了诸
 **[05-core-classes.md](./05-core-classes.md)**
 - VerifyAgent、StageManager、VerifyStage
 - Checker 基类与工具系统
-
----
-
-## 相关链接
-
-UCAgent源码：https://github.com/XS-MLVP/UCAgent
-
-UCAgent开发者手册：https://ucagent.open-verify.cc/
-
-LangGraph：https://langgraph.readthedocs.io/en/latest/
 
 ---
 
