@@ -1,6 +1,6 @@
 # UCAgent 源码学习笔记
 
-> 深入理解 UCAgent 的源码、算法
+> 本笔记带大家深入理解 UCAgent 的源码、算法
 
 ---
 
@@ -30,14 +30,14 @@ UCAgent 首先用 YAML 配置文件规范了测试的整个流程，分成了诸
 
 ## 核心理念
 
-解读 UCAgent 要围绕**系统架构**和**Prompt工程**这两个方面展开。
+由于在 Agent 项目中，大量设计均是以 Prompt 的形式存在，因此解读 UCAgent 要围绕**源码部分**和**Prompt部分**这两个方面展开。
 
-**系统架构部分**（详见 [00-core-concepts.md](./00-core-concepts.md)）：
+**源码部分**（详见 [00-core-concepts.md](./00-core-concepts.md)）：
 - **Stage**（流程编排）：通过 YAML 配置定义验证流程
 - **Agent**（执行引擎）：LLM + LangGraph ReAct 框架
 - **Checker**（验证机制）：pytest、bash 脚本、人工审查
 
-**Prompt工程部分**（详见 [02-prompt-engineering.md](./02-prompt-engineering.md)）：
+**Prompt部分**（详见 [02-prompt-engineering.md](./02-prompt-engineering.md)）：
 - **System Prompt**（角色定义）：定义 LLM 的角色、目标、工作方式
 - **Stage Task Prompt**（任务细节）：每个 Stage 的具体任务描述
 
