@@ -281,26 +281,19 @@ self.agent = create_react_agent(
 
 ReAct = **Rea**soning（推理）+ **Act**ing（行动）
 
-```
-┌─────────────────────────────────────┐
-│  1. Reasoning (推理)                 │
-│     LLM: "我需要先读README了解功能"   │
-│     [由 LLM 根据 Prompt 决定]        │
-└─────────────────────────────────────┘
-              ↓
-┌─────────────────────────────────────┐
-│  2. Acting (行动)                    │
-│     调用工具: ReadTextFile("README") │
-│     [由 LangGraph 自动执行]          │
-└─────────────────────────────────────┘
-              ↓
-┌─────────────────────────────────────┐
-│  3. Observation (观察)               │
-│     收到: README内容                 │
-│     [由 LangGraph 返回给 LLM]        │
-└─────────────────────────────────────┘
-              ↓
-         回到步骤1，继续推理...
+```mermaid
+graph LR
+    A[开始] --> B[1. Reasoning<br/>推理<br/>LLM决定下一步]
+    B --> C[2. Acting<br/>行动<br/>调用工具]
+    C --> D[3. Observation<br/>观察<br/>收到结果]
+    D --> E{任务完成?}
+    E -->|否| B
+    E -->|是| F[调用Complete<br/>进入下一阶段]
+
+    style B fill:#ffe1e1
+    style C fill:#e1f5ff
+    style D fill:#f0ffe1
+    style F fill:#fff4e1
 ```
 
 **Agent 行为的控制层次**:
@@ -428,41 +421,38 @@ LLM 根据反馈决定下一步行动：
 
 ### 3.1 完整工作流程
 
+```mermaid
+sequenceDiagram
+    participant User as 用户
+    participant SM as StageManager
+    participant Agent as LLM Agent
+    participant Tools as 工具集
+    participant Checker as Checker
+
+    User->>SM: 启动 UCAgent
+    SM->>SM: 加载配置，解析 Stage
+    SM->>Agent: 进入 Stage 1
+
+    loop ReAct 循环
+        Agent->>Agent: Reasoning (推理)
+        Agent->>Tools: Acting (调用工具)
+        Tools-->>Agent: Observation (返回结果)
+    end
+
+    Agent->>Tools: 调用 Check()
+    Tools->>Checker: 执行检查
+    Checker-->>Agent: 返回检查结果
+
+    alt 检查通过
+        Agent->>Tools: 调用 Complete()
+        Tools->>SM: 推进到下一阶段
+        SM->>Agent: 进入 Stage 2
+    else 检查失败
+        Agent->>Agent: 重复之前的，直至检查通过
+    end
 ```
-启动 UCAgent
-    ↓
-加载配置，解析所有 Stage
-    ↓
-┌─────────────────────────────────────┐
-│  进入 Stage 1: 需求分析              │
-└─────────────────────────────────────┘
-    ↓
-StageManager 返回当前 Stage 的任务
-    ↓
-┌─────────────────────────────────────┐
-│  Agent (LLM) 开始 ReAct 循环         │
-│  - 推理：需要读 README               │
-│  - 行动：ReadTextFile("README")     │
-│  - 观察：收到 README 内容            │
-│  - 推理：需要生成验证计划             │
-│  - 行动：WriteTextFile("plan.md")   │
-│  - 推理：需要检查是否完成             │
-│  - 行动：Check()                    │
-└─────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────┐
-│  Checker 执行检查                    │
-│  - 检查文件是否读取                  │
-│  - 检查文件是否生成                  │
-│  - 返回结果给 LLM                    │
-└─────────────────────────────────────┘
-    ↓
-如果通过 → Agent 调用 Complete()
-    ↓
-StageManager 推进到 Stage 2
-    ↓
-重复上述流程...
-```
+
+**详细流程说明**：
 
 ### 3.2 Stage 的加载和执行顺序控制机制
 

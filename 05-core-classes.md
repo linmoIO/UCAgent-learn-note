@@ -513,21 +513,134 @@ class UCTool(BaseTool):
 
 ## 6. 类关系图
 
+```mermaid
+classDiagram
+    %% 核心管理类
+    class VerifyAgent {
+        +ChatOpenAI model
+        +StageManager stage_manager
+        +LangGraph agent
+        +List~UCTool~ test_tools
+        +run()
+        +one_loop()
+        +get_current_tips()
+        +do_work()
+    }
+
+    class StageManager {
+        +VerifyStage root_stage
+        +List~VerifyStage~ stages
+        +int stage_index
+        +VerifyAgent agent
+        +init_stage()
+        +get_current_tips()
+        +check()
+        +complete()
+        +next_stage()
+    }
+
+    class VerifyStage {
+        +string name
+        +string desc
+        +List~Checker~ checker
+        +List~VerifyStage~ substages
+        +VerifyStage parent
+        +dict reference_files
+        +list output_files
+        +do_check()
+        +get_substages()
+        +is_group()
+        +on_init()
+        +on_complete()
+    }
+
+    %% Checker 体系
+    class Checker {
+        <<abstract>>
+        +workspace
+        +stage_manager
+        +check()
+        +do_check()*
+        +set_workspace()
+        +set_stage_manager()
+    }
+
+    class UnityTestChecker {
+        +do_check()
+        执行 pytest 测试
+    }
+
+    class HumanChecker {
+        +do_check()
+        等待人工审查
+    }
+
+    class NopChecker {
+        +do_check()
+        空操作检查器
+    }
+
+    %% Tool 体系
+    class BaseTool {
+        <<LangChain>>
+        +name
+        +description
+        +invoke()
+    }
+
+    class UCTool {
+        +int call_time_out
+        +int call_count
+        +set_call_time_out()
+        +get_call_time_out()
+        +_run()*
+    }
+
+    class ManagerTool {
+        +Callable function
+        +set_function()
+        +_run()
+    }
+
+    class ReadTextFile {
+        +workspace
+        +_run()
+        读取文本文件
+    }
+
+    class ToolDoCheck {
+        +_run()
+        执行阶段检查
+    }
+
+    class ToolDoComplete {
+        +_run()
+        完成当前阶段
+    }
+
+    class ToolCurrentTips {
+        +_run()
+        获取当前任务提示
+    }
+
+    %% 关系定义
+    VerifyAgent --> StageManager : 持有
+    VerifyAgent --> UCTool : 管理工具列表
+    StageManager --> VerifyStage : 管理阶段列表
+    StageManager --> VerifyAgent : 引用
+    VerifyStage --> Checker : 包含检查器
+    VerifyStage --> VerifyStage : substages 子阶段
+    Checker --> StageManager : 引用
+
+    %% 继承关系
+    Checker <|-- UnityTestChecker
+    Checker <|-- HumanChecker
+    Checker <|-- NopChecker
+    BaseTool <|-- UCTool
+    UCTool <|-- ManagerTool
+    UCTool <|-- ReadTextFile
+    ManagerTool <|-- ToolDoCheck
+    ManagerTool <|-- ToolDoComplete
+    ManagerTool <|-- ToolCurrentTips
 ```
-VerifyAgent
-  ├─ model (ChatOpenAI)
-  ├─ stage_manager (StageManager)
-  │   ├─ root_stage (VerifyStage)
-  │   └─ stages (List[VerifyStage])
-  │       └─ checker (List[UCChecker])
-  │           ├─ UnityTestChecker
-  │           ├─ BashScriptChecker
-  │           └─ HumanChecker
-  ├─ agent (LangGraph ReAct Agent)
-  └─ test_tools (List[UCTool])
-      ├─ ReadTextFile
-      ├─ EditTextFile
-      ├─ ToolCurrentTips
-      ├─ ToolDoCheck
-      └─ ToolDoComplete
-```
+

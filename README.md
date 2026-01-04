@@ -22,7 +22,48 @@ LangGraph：https://langgraph.readthedocs.io/en/latest/
 
 UCAgent 首先用 YAML 配置文件规范了测试的整个流程，分成了诸多 Stage，每个 Stage 都有详细的描述（作为 LLM 的 Prompt）。运行时从头执行到尾，即为完成一次验证。
 
+```mermaid
+graph LR
+    Start([开始]) --> Stage1[Stage 1]
+    Stage1 --> Stage2[Stage 2]
+    Stage2 --> Stage3[...]
+    Stage3 --> StageN[Stage N]
+    StageN --> End([结束])
+
+    style Start fill:#e1f5e1
+    style End fill:#ffe1e1
+    style Stage1 fill:#e1f0ff
+    style Stage2 fill:#e1f0ff
+    style Stage3 fill:#e1f0ff
+    style StageN fill:#e1f0ff
+```
+
 对于每个 Stage，会启动 Agent（Agent = LLM + 工具），并赋予相关的 Prompt，指导完成本次 Stage 的任务。Agent 会以 ReAct 模式（推理 → 行动，不断重复，直至结束），调用文件处理工具、硬件验证工具链（toffee）。完成任务后，会按照 Prompt 的指引，调用 Checker（包括 pytest 和人为 check 等），如果通过则表示本 Stage 完成。
+
+```mermaid
+graph LR
+    StageStart([Stage 开始]) --> GetPrompt[接收 Stage Prompt<br/>任务描述]
+    GetPrompt --> ReactLoop{ReAct 循环}
+
+    ReactLoop --> Reasoning[Reasoning<br/>推理下一步行动]
+    Reasoning --> Acting[Acting<br/>调用工具执行]
+    Acting --> Observation[Observation<br/>观察结果]
+    Observation --> TaskDone{任务完成?}
+
+    TaskDone -->|否| ReactLoop
+    TaskDone -->|是| CallChecker[调用 Checker<br/>验证结果]
+
+    CallChecker --> CheckResult{检查通过?}
+    CheckResult -->|否| ReactLoop
+    CheckResult -->|是| StageEnd([Stage 结束<br/>进入下一阶段])
+
+    style StageStart fill:#e1f5e1
+    style StageEnd fill:#e1f5e1
+    style Reasoning fill:#ffe1e1
+    style Acting fill:#e1f0ff
+    style Observation fill:#fff4e1
+    style CallChecker fill:#f0e1ff
+```
 
 > 用户参与的部分：1. 编写 Stage 的 YAML 配置文件（UCAgent 已提供默认的）；2. 人工 check 部分。
 
